@@ -1,0 +1,16 @@
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    container_name: majjhima_db
+    environment:
+      POSTGRES_USER: majjhima
+      POSTGRES_PASSWORD: majjhima123
+      POSTGRES_DB: majjhima
+    ports:
+      - "5432:5432"
+    volumes:
+      - majjhima_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+volumes:
+  majjhima_data:
