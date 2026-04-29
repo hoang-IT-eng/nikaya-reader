@@ -1,52 +1,42 @@
 "use client";
 import { useEffect, useState } from "react";
-import { fetchDiscourse, addBookmark } from "@/lib/api";
+import { fetchDiscourse } from "@/lib/api";
 import type { Discourse } from "@/lib/types";
+import DiscourseReader from "@/components/DiscourseReader";
 
 export default function DiscoursePage({ params }: { params: { id: string } }) {
   const [discourse, setDiscourse] = useState<Discourse | null>(null);
-  const [bookmarked, setBookmarked] = useState(false);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
-    fetchDiscourse(Number(params.id)).then(setDiscourse);
+    fetchDiscourse(Number(params.id))
+      .then(setDiscourse)
+      .catch(() => setError(true));
   }, [params.id]);
 
-  if (!discourse) return <div className="text-stone-400">Loading...</div>;
-
-  const paragraphs = discourse.full_text?.split("\n\n").filter(Boolean) || [];
-
-  return (
-    <div className="max-w-2xl">
-      {/* Header */}
-      <div className="mb-8">
-        <p className="text-sm text-stone-400 mb-1">MN {discourse.mn_number} · Volume {discourse.volume}</p>
-        <h1 className="text-2xl font-bold mb-1">{discourse.title_en}</h1>
-        <p className="text-stone-500 italic">{discourse.title_pali}</p>
-        <p className="text-xs text-stone-400 mt-1">{discourse.vagga}</p>
+  if (error) {
+    return (
+      <div className="text-center py-16">
+        <p className="text-stone-400 mb-4">MN {params.id} not found.</p>
+        <a href="/library" className="text-amber-700 hover:underline">← Back to Library</a>
       </div>
+    );
+  }
 
-      {/* Bookmark */}
-      <button onClick={async () => {
-          await addBookmark(discourse.mn_number);
-          setBookmarked(true);
-        }}
-        className={`mb-8 px-4 py-1.5 rounded-full text-sm border ${
-          bookmarked ? "bg-amber-700 text-white border-amber-700" : "border-stone-300 hover:bg-stone-100"
-        }`}>
-        {bookmarked ? "Bookmarked" : "Bookmark"}
-      </button>
-
-      {/* Content */}
-      <div className="prose prose-stone max-w-none">
-        {paragraphs.map((p, i) => (
-          <p key={i} className="mb-4 leading-relaxed">{p}</p>
-        ))}
+  if (!discourse) {
+    return (
+      <div className="max-w-2xl space-y-4 animate-pulse">
+        <div className="h-4 bg-stone-100 rounded w-32" />
+        <div className="h-8 bg-stone-100 rounded w-2/3" />
+        <div className="h-4 bg-stone-100 rounded w-1/3" />
+        <div className="mt-8 space-y-3">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="h-4 bg-stone-100 rounded" />
+          ))}
+        </div>
       </div>
+    );
+  }
 
-      {/* Citation */}
-      <div className="mt-12 pt-6 border-t border-stone-200 text-xs text-stone-400">
-        Source: Middle Discourses (Majjhima Nikāya), Bhikkhu Sujato · MN {discourse.mn_number} · Volume {discourse.volume}
-      </div>
-    </div>
-  );
+  return <DiscourseReader discourse={discourse} />;
 }
