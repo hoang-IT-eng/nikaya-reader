@@ -14,6 +14,8 @@ class Discourse(Base):
     page_start = Column(Integer)
     page_end   = Column(Integer)
     full_text  = Column(Text)
+    title_vi     = Column(Text, nullable=True)
+    full_text_vi = Column(Text, nullable=True)
 
     chunks = relationship("Chunk", back_populates="discourse", cascade="all, delete-orphan")
 

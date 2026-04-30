@@ -7,6 +7,8 @@ export interface Discourse {
   vagga: string;
   page_start: number;
   full_text?: string;
+  title_vi?: string | null;
+  full_text_vi?: string | null;
 }
 
 export interface Bookmark {

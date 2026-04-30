@@ -13,7 +13,7 @@ async def create_tables():
     async with engine.begin() as conn:
         await conn.execute(__import__('sqlalchemy').text("CREATE EXTENSION IF NOT EXISTS pg_trgm"))
         await conn.execute(__import__('sqlalchemy').text("CREATE EXTENSION IF NOT EXISTS vector"))
-        await Base.metadata.create_all(conn)
+        await conn.run_sync(Base.metadata.create_all)
     print("Tables created.")
 
 async def import_discourses(json_path: str):
